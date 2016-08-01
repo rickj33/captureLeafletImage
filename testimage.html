@@ -34,7 +34,7 @@
     z-index:1000;
   }
   #map {
-    width:50%;
+   /* width:50%;*/
     height: 900px;
   }
   #snapshot {
@@ -53,9 +53,11 @@
 
     var imageCapture = null;
 
-var center =   new L.LatLng(32.29641979896909,-84.63867187500001 )
-	//var map = L.map('map').setView([37.8, -96], 13);
+  var center =   new L.LatLng(32.29641979896909,-84.63867187500001 )
   var map  = new L.Map( 'map', {
+    //if animate is true, then the svg markers will not be positioned correctly in the image capture.
+    //I found this which may be releated.
+    //https://blog.sumbera.com/2015/08/14/svg-fast-scaled-overlay-on-leaflet-1-0/
     animate : false,
     renderer: new L.Canvas(),
     fadeAnimation : false,
