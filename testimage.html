@@ -1,0 +1,182 @@
+<html><head>
+<title>Leaflet Dog Start Guide Example</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="node_modules/leaflet/dist/leaflet.css" rel="stylesheet">
+
+
+<script src="node_modules/leaflet/dist/leaflet-src.js"></script>
+<script src="node_modules/d3-queue/build/d3-queue.js"></script>
+<script src="node_modules/lodash/lodash.min.js"></script>
+<script src="node_modules/canvg/canvg.js"></script>
+<script src="node_modules/canvg/rgbcolor.js"></script>
+<script src="node_modules/canvg/StackBlur.js"></script>
+
+
+<script src="leaflet-dvf.js"  type="text/javascript" ></script>
+
+<script src="imageService.js"></script>
+<script src="virtualRenderer.js"></script>
+<script src="virtualCanvasRenderer.js"></script>
+<script src="virtualSVGRenderer.js"></script>
+<script src="tile.stamen.js"></script>
+
+<script src="locationDataPoints.js"  type="text/javascript" ></script>
+<script src="gz_2010_us_040_00_500k.js"></script>
+
+
+<style>
+  .ui-button {
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:1000;
+  }
+  #map {
+    width:50%;
+    height: 900px;
+  }
+  #snapshot {
+    position:absolute;
+    top:0;bottom:0;right:0;
+    width:50%;
+  }
+</style>
+</head>
+<body>
+  <button id='save' class='ui-button'>Save Image</button>
+  <button id='zoom1' >zoom</button>
+ <div id='map' ></div>
+  <script>
+   
+
+    var imageCapture = null;
+
+var center =   new L.LatLng(32.29641979896909,-84.63867187500001 )
+	//var map = L.map('map').setView([37.8, -96], 13);
+  var map  = new L.Map( 'map', {
+    animate : false,
+    renderer: new L.Canvas(),
+    fadeAnimation : false,
+    center                  : center
+
+  } ).setView(center, 7, {animate : false});
+
+
+ var baseLayer = new L.StamenTileLayer('toner', {
+            detectRetina: true,
+              opacity: 0.3,
+        }).addTo(map);
+
+        baseLayer.addTo(map);
+
+ 
+ 
+ var statesLayer = new L.GeoJSON(states, {
+                style: function (feature) {
+                    return {
+                        color: '#333',
+                        opacity: 1.0,
+                        weight: 3,
+                        fillOpacity: 0.5,
+                        fillColor : 'darkcyan'
+                        
+                    }
+                }
+            });
+
+            map.addLayer(statesLayer);
+
+  var svgRenderer =  new L.SVG();
+ 
+  var datalayer = new L.DataLayer( dataPoints1, {
+    renderer          :  svgRenderer,
+    pane              : 'markerPane',
+    recordsField      : null,
+    latitudeField     : 'latitude',
+    longitudeField    : 'longitude',
+    locationMode      : L.LocationModes.LATLNG,
+    getMarker         : function(location, options, record){
+      options.renderer = svgRenderer;
+      options.numberOfSides = 5;
+       options.fillOpacity = 1;
+      options.fillColor = 'green';
+      return new L.RegularPolygonMarker( location, options );
+
+    }
+   });
+  datalayer.addTo(map);
+
+ var svgRenderer1 =  new L.SVG();
+//var svgRenderer1 =svgRenderer
+
+
+ var datalayer = new L.DataLayer( dataPoints2, {
+    renderer          :  svgRenderer1,
+    pane              : 'markerPane',
+    recordsField      : null,
+    latitudeField     : 'latitude',
+    longitudeField    : 'longitude',
+    locationMode      : L.LocationModes.LATLNG,
+    getMarker         : function(location, options, record){
+      options.renderer = svgRenderer1;
+      options.numberOfSides = 60;
+      options.fillColor = 'purple';
+         options.fillOpacity=1;
+      return new L.RegularPolygonMarker( location, options );
+
+    }
+   });
+  datalayer.addTo(map);
+
+/*  var bounds = statesLayer.getBounds();
+  map.fitBounds(bounds);*/
+  map.on('moveend ', function(ev) {
+      var zoomLevel = map.getZoom();
+      var mapCenter = map.getCenter();
+      var mapbounds = map.getBounds();
+      console.log('zoomend  ' + zoomLevel.toString());
+      console.log('mapCenter  ' + JSON.stringify(mapCenter));
+      console.log('mapBounds  ' + JSON.stringify(mapbounds));
+});
+
+
+
+  document.getElementById('save').addEventListener('click', function() {
+   
+    saveImage(map);
+    
+  });
+
+  function getMarker(location, options, record){
+    return new L.RegularPolygonMarker( location, {numberOfSides:5} );
+  }
+
+
+  function saveImage(map)
+  {
+     ImageService.createImage(map).then(function(canvas)
+    {
+      if (canvas)
+      {
+        var downloadImageElement = document.createElement('a');
+        downloadImageElement.href = canvas.toDataURL('image/png');
+        downloadImageElement.target = '_self';
+        downloadImageElement.download = 'map.png';
+        downloadImageElement.click();
+        L.DomUtil.remove(downloadImageElement);
+
+      }
+
+    }, function(error)
+    {
+      console.log(error);
+    });
+
+  };
+
+</script>
+
+
+</body></html>

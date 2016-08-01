@@ -1,0 +1,13 @@
+{
+  "name": "captureimage",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "d3-queue": "^3.0.1",
+    "leaflet": "^1.0.0-rc.2",
+    "lodash": "^4.14.0",
+    "grunt-commit": "git://github.com/rickj33/canvg.git"
+  }
+}
